@@ -1,23 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import React from 'react';
+import "./App.css";
+import UserForm from "./components/UserForm.js";
+import UserList from "./components/UserList.js";
+import {getUserInput,createUserInput, updateUserInput, deleteUserInput} from './restapi/restapi';
 
 function App() {
+  // here we create an array state to store the contact form data
+  const [userInputs, setUserInputs] = useState([]);
+
+    const refreshUserInput = async() => {
+      const newUserInput = await getUserInput();
+      setUserInputs(newUserInput);
+    }
+    useEffect(() => {
+      refreshUserInput();
+    },[])
+
+    const handleDelete = async(userInput) => {
+      await deleteUserInput(userInput);
+      refreshUserInput();
+    }
+
+
+  const addUserInput = (userInput) => {
+    setUserInputs([...userInputs, userInput]);
+  };
+  console.log(userInputs);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <UserForm addUserInput={addUserInput} />
+      <UserList userInputs={userInputs} onDelete={handleDelete}/>
     </div>
   );
 }
